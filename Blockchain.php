@@ -60,7 +60,14 @@ class Blockchain {
   /**
    *
    */
-  public function createTransaction($transaction) {
+  public function addTransaction($transaction) {
+    if (!$transaction->fromAddress || !$transaction->toAddress) {
+      throw new Exception('Transaction must include from and to address');
+    }
+
+    if (!$transaction->isValid()) {
+      throw new Exception('Cannot add invalid transaction');
+    }
     array_push($this->pendingTransactions, $transaction);
   }
 
@@ -70,8 +77,6 @@ class Blockchain {
   public function getBalanceOfAddress($address) {
     $balance = 0;
     foreach ($this->chain as $block) {
-      /*       var_dump($block);
-      die; */
       foreach ($block->transactions as $trans) {
         if ($trans->fromAddress === $address) {
           $balance -= $trans->amount;
@@ -82,7 +87,6 @@ class Blockchain {
       }
     }
     echo 'the balance of the address ' . $address . ' is: ' . $balance . '</br>';
-    // Return $balance;.
   }
 
   /**
@@ -93,15 +97,20 @@ class Blockchain {
       $currentBlock = $this->chain[$i];
       $previousBlock = $this->chain[$i - 1];
 
+      if (!$currentBlock->hasValidTransactions()) {
+        echo 'false transaction </br>';
+        return;
+      }
+
       if ($currentBlock->hash !== $currentBlock->calculateHash()) {
         // Return FALSE;.
-        echo 'false 1 </br>';
+        echo 'hash has been tampered </br>';
         return;
       }
 
       if ($currentBlock->previousHash !== $previousBlock->hash) {
         // Return FALSE;.
-        echo 'false 2 </br>';
+        echo 'block info has been tampered </br>';
         return;
       }
 
@@ -111,50 +120,3 @@ class Blockchain {
   }
 
 }
-
-$blockchain = new Blockchain();
-
-
-/* echo 'mining block1 </br>';
-$blockchain->addBlock(new Block('12345', json_encode(['ammount' => '100'])));
-echo 'mining block2 </br>';
-$blockchain->addBlock(new Block('12345', json_encode(['ammount' => '200'])));
-echo 'mining block3 </br>';
-$blockchain->addBlock(new Block('12345', json_encode(['ammount' => '-500']))); */
-
-
-// Second logic block.
-$blockchain->createTransaction(new Transaction('address1', 'address2', '100'));
-$blockchain->createTransaction(new Transaction('address2', 'address1', '200'));
-$blockchain->createTransaction(new Transaction('address1', 'address2', '500'));
-$blockchain->miningPendingTransactions('miner-address');
-
-
-$blockchain->getBalanceOfAddress('address1');
-$blockchain->getBalanceOfAddress('address2');
-$blockchain->getBalanceOfAddress('miner-address');
-
-
-
-$blockchain->isChainValid();
-// Echo serialize($blockchain->chain);.
-echo "<pre>";
-print_r($blockchain->chain);
-echo "</pre>";
-
-$blockchain->createTransaction(new Transaction('address1', 'address2', '100'));
-$blockchain->createTransaction(new Transaction('address2', 'address1', '200'));
-$blockchain->createTransaction(new Transaction('address1', 'address2', '500'));
-$blockchain->miningPendingTransactions('miner-address');
-$blockchain->getBalanceOfAddress('address1');
-$blockchain->getBalanceOfAddress('address2');
-$blockchain->getBalanceOfAddress('miner-address');
-
-
-//$blockchain->chain[2]->data = 'este é que é o bloco 2'; //tampering 1
-// $blockchain->chain[2]->hash = $blockchain->chain[2]->calculateHash(); //tampering 2
-$blockchain->isChainValid();
-// Echo serialize($blockchain->chain);.
-echo "<pre>";
-print_r($blockchain->chain);
-echo "</pre>";

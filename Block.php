@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  *
  */
@@ -18,7 +17,7 @@ class Block {
    *
    */
   public $previousHash;
-    /**
+  /**
    *
    */
   public $nonce;
@@ -38,7 +37,6 @@ class Block {
    *
    */
   public function calculateHash() {
-    // Echo 'this is hash: ' .  hash('sha256', $this->index . $this->previousHash . $this->timestamp . $this->transactions);.
     return hash('sha256', $this->previousHash . $this->timestamp . json_encode($this->transactions) . $this->nonce);
   }
 
@@ -53,6 +51,16 @@ class Block {
     echo 'BLOCK MINED: ' . $this->hash . '</br>';
   }
 
-}
+  /**
+   *
+   */
+  public function hasValidTransactions() {
+    for ($i = 1; $i <= count($this->transactions); $i++) {
+      if (!$this->transactions[$i - 1]->isValid()) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
 
-// New Block('1', '12342', 'ola');.
+}

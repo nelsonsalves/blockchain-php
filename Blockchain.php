@@ -35,16 +35,6 @@ class Blockchain {
   /**
    *
    */
-
-  /**
-   * Public function addBlock($newBlock) {
-   * $newBlock->previousHash = $this->getLatestBlock()->hash;
-   * $newBlock->hash = $newBlock->calculateHash();
-   * $newBlock->mineBlock($this->difficulty);
-   * array_push($this->chain, $newBlock);
-   * return $this->chain[count($this->chain) - 1];
-   * } .
-   */
   public function miningPendingTransactions($miningRewardAddress) {
     $block = new Block('01/01/2021', $this->pendingTransactions);
     $block->previousHash = $this->getLatestBlock()->hash;
@@ -54,7 +44,6 @@ class Blockchain {
     $this->pendingTransactions = [
       new Transaction(NULL, $miningRewardAddress, $this->miningReward),
     ];
-
   }
 
   /**
@@ -103,19 +92,16 @@ class Blockchain {
       }
 
       if ($currentBlock->hash !== $currentBlock->calculateHash()) {
-        // Return FALSE;.
         echo 'hash has been tampered </br>';
         return;
       }
 
       if ($currentBlock->previousHash !== $previousBlock->hash) {
-        // Return FALSE;.
         echo 'block info has been tampered </br>';
         return;
       }
 
       echo 'true </br>';
-      // Return TRUE;.
     }
   }
 
